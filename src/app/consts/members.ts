@@ -17,6 +17,9 @@ const members: Array<Member> = [
     name: 'Mello',
   },
   {
+    name: 'Felipe shaco',
+  },
+  {
     name: 'Lucas',
   },
   {
