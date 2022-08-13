@@ -1,6 +1,6 @@
-import * as trpc from '@trpc/server';
-import { membersController } from 'app/controllers/members.controller';
+import loginController from './controllers/login.controller';
+import { createRouter } from './utils/createRouter';
 
-export const appRouter = trpc.router().merge('members.', membersController);
+export const appRouter = createRouter().merge(loginController);
 
 export type AppRouter = typeof appRouter;

@@ -1,17 +1,31 @@
+import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ChakraProvider } from '@chakra-ui/react';
 import { withTRPC } from '@trpc/next';
 import { AppRouter } from 'app/router';
+import { AuthProvider } from 'common/hooks/useAuth';
+import theme from 'common/styles/theme';
+
+// eslint-disable-next-line import/no-mutable-exports
+export const authInfo: { token: string | null } = {
+  token: null,
+};
 
 function MyApp({ Component, pageProps }: AppProps): React.ReactElement {
+  useEffect(() => {
+    authInfo.token = localStorage.getItem('auth');
+  }, []);
+
   return (
-    <ChakraProvider>
-      <Head>
-        <title>Forum reviewer</title>
-      </Head>
-      <Component {...pageProps} />
-    </ChakraProvider>
+    <AuthProvider>
+      <ChakraProvider theme={theme}>
+        <Head>
+          <title>Forum reviewer</title>
+        </Head>
+        <Component {...pageProps} />
+      </ChakraProvider>
+    </AuthProvider>
   );
 }
 
@@ -39,10 +53,15 @@ export default withTRPC<AppRouter>({
           },
         },
       },
+      headers() {
+        return {
+          Authorization: authInfo.token || undefined,
+        };
+      },
     };
   },
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: true,
+  // ssr: true,
 })(MyApp);
