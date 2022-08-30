@@ -58,8 +58,10 @@ const RestaurantsList: React.FC = () => {
               </Text>
             </Center>
             <Flex align="center">
-              <VStack spacing={2} align="flex-start">
-                <Text fontWeight="small">Quantidade de reviews: 3</Text>
+              <VStack spacing={1} align="flex-start">
+                <Text fontWeight="semibold" ml={1}>
+                  Reviews: 3
+                </Text>
                 <Flex flexFlow="wrap">
                   {restaurant.wayToOrder.map(wayToOrder => (
                     <Badge as={Box} borderRadius="md" m={1} px={2} py={0.5} key={`restaurant.id_${wayToOrder}`}>
