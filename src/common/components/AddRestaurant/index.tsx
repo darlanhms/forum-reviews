@@ -90,7 +90,7 @@ const AddRestaurant: React.FC = () => {
   };
 
   return (
-    <Box w="100%" display="flex" justifyContent="flex-end" py={4}>
+    <>
       <Button onClick={setOpen.on} colorScheme="green">
         + Adicionar
       </Button>
@@ -135,7 +135,7 @@ const AddRestaurant: React.FC = () => {
           </ModalContent>
         </Modal>
       )}
-    </Box>
+    </>
   );
 };
 
