@@ -60,7 +60,7 @@ const RestaurantsList: React.FC = () => {
             <Flex align="center">
               <VStack spacing={1} align="flex-start">
                 <Text fontWeight="semibold" ml={1}>
-                  Reviews: 3
+                  Reviews: {restaurant.reviewsAmount}
                 </Text>
                 <Flex flexFlow="wrap">
                   {restaurant.wayToOrder.map(wayToOrder => (
@@ -73,7 +73,7 @@ const RestaurantsList: React.FC = () => {
             </Flex>
             <Center>
               <Text color="green" fontSize="2xl">
-                8.5
+                {restaurant.averageRating}
               </Text>
             </Center>
           </Grid>

@@ -3,29 +3,24 @@ import { FILE_PREFIX } from '../core/consts';
 import { BaseRepository } from './BaseRepository';
 
 export default class RestaurantRepository extends BaseRepository<Restaurant> {
-  protected get filePath(): string {
+  private getFilePath(): string {
     return `${FILE_PREFIX}/restaurants.json`;
+  }
+
+  compare(a: Restaurant, b: Restaurant): boolean {
+    return a.id === b.id;
+  }
+
+  async getAll(): Promise<Array<Restaurant>> {
+    return super.getAll(this.getFilePath());
   }
 
   async save(restaurant: Restaurant): Promise<Restaurant> {
     const restaurants = await this.getAll();
 
-    const alreadyExistingRestaurantIndex = restaurants.findIndex(({ id }) => id === restaurant.id);
+    const newRestaurants = this.updateOrInsertInArray(restaurants, restaurant);
 
-    if (alreadyExistingRestaurantIndex !== -1) {
-      const oldRestaurant = restaurants[alreadyExistingRestaurantIndex];
-
-      const updatedRestaurant = {
-        ...oldRestaurant,
-        ...restaurant,
-      };
-
-      restaurants[alreadyExistingRestaurantIndex] = updatedRestaurant;
-    } else {
-      restaurants.push(restaurant);
-    }
-
-    await this.saveFileContent(restaurants);
+    await this.saveFileContent(this.getFilePath(), newRestaurants);
 
     return restaurant;
   }

@@ -5,5 +5,7 @@ export type WayToOrder = typeof waysToOrder[number];
 export default interface Restaurant {
   id: string;
   name: string;
+  averageRating: number;
+  reviewsAmount: number;
   wayToOrder: Array<WayToOrder>;
 }

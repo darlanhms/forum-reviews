@@ -7,9 +7,11 @@ export default class CreateRestaurantUseCase {
   execute(request: CreateRestaurantRequest): Promise<Restaurant> {
     const restaurantRepo = new RestaurantRepository();
 
-    const restaurant = {
+    const restaurant: Restaurant = {
       ...request,
       id: uuid(),
+      averageRating: 0,
+      reviewsAmount: 0,
     };
 
     return restaurantRepo.save(restaurant);
