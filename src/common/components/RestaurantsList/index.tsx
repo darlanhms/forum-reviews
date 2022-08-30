@@ -9,7 +9,6 @@ import {
   InputGroup,
   InputRightElement,
   Text,
-  VisuallyHidden,
   VStack,
 } from '@chakra-ui/react';
 import { useArrayQuery } from 'common/hooks/useArrayQuery';
