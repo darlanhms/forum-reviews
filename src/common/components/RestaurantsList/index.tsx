@@ -9,6 +9,7 @@ import {
   InputGroup,
   InputRightElement,
   Text,
+  VisuallyHidden,
   VStack,
 } from '@chakra-ui/react';
 import { useArrayQuery } from 'common/hooks/useArrayQuery';
@@ -27,7 +28,7 @@ const RestaurantsList: React.FC = () => {
   return (
     <Box>
       <Grid templateColumns="125px auto 180px" my={5}>
-        {member && <AddRestaurant />}
+        {member ? <AddRestaurant /> : <div />}
         <div />
         <InputGroup>
           <Input onChange={e => handleSearch(e.target.value)} placeholder="Pesquisar..." />
