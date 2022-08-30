@@ -14,8 +14,8 @@ if (!bucketName) {
   throw new Error('Bucket name undefined!!!');
 }
 
-export default abstract class S3FileManager {
-  protected async create(name: string, body: string): Promise<void> {
+export default class S3FileManager {
+  async create(name: string, body: string): Promise<void> {
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: name,
@@ -25,7 +25,7 @@ export default abstract class S3FileManager {
     await s3Client.send(command);
   }
 
-  protected async update(name: string, newBody: string): Promise<void> {
+  async update(name: string, newBody: string): Promise<void> {
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: name,
@@ -35,7 +35,7 @@ export default abstract class S3FileManager {
     await s3Client.send(command);
   }
 
-  protected async delete(name: string): Promise<void> {
+  async delete(name: string): Promise<void> {
     const command = new DeleteObjectCommand({
       Bucket: bucketName,
       Key: name,
@@ -44,7 +44,7 @@ export default abstract class S3FileManager {
     await s3Client.send(command);
   }
 
-  protected async get(name: string): Promise<Buffer | undefined> {
+  async get(name: string): Promise<Buffer | undefined> {
     return new Promise(resolve => {
       try {
         const command = new GetObjectCommand({
@@ -78,7 +78,7 @@ export default abstract class S3FileManager {
     });
   }
 
-  protected bufferToJson<T>(buffer: Buffer): T {
+  bufferToJson<T>(buffer: Buffer): T {
     return JSON.parse(buffer.toString());
   }
 }
