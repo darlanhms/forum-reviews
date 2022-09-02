@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }: AppProps): React.ReactElement {
     <AuthProvider>
       <ChakraProvider theme={theme}>
         <Head>
-          <title>Forum reviewer</title>
+          <title>Forum reviews</title>
         </Head>
         <Component {...pageProps} />
       </ChakraProvider>

@@ -4,19 +4,22 @@ import { FaPencilAlt, FaPlus, FaTrashAlt } from 'react-icons/fa';
 import {
   Center,
   Container,
-  Divider,
   Flex,
   Grid,
   Heading,
   IconButton,
   Skeleton,
   Spinner,
+  Text,
   useBoolean,
   VStack,
 } from '@chakra-ui/react';
+import AverageText from 'common/components/AverageText';
 import DeleteReviewModal from 'common/components/DeleteReviewModal';
 import Navbar from 'common/components/Navbar';
+import RestaurantReviewsAverages from 'common/components/RestaurantReviewsAverages';
 import ReviewModal from 'common/components/ReviewModal';
+import ReviewsTable from 'common/components/ReviewsTable';
 import useAuth from 'common/hooks/useAuth';
 import { useTRPC } from 'common/hooks/useTRPC';
 
@@ -45,9 +48,11 @@ const RestaurantPage: NextPage = () => {
     <>
       <Navbar />
       <Container maxW="container.lg">
-        <Grid templateColumns="80% 20%" p={4}>
+        <Grid templateColumns="80% 20%" py={4}>
           <Flex align="center">
-            <Heading fontSize="xl">{restaurant.name}</Heading>
+            <Heading fontSize="3xl" fontWeight="normal">
+              {restaurant.name}
+            </Heading>
           </Flex>
           {member && (
             <Flex gap="5px" justify="flex-end">
@@ -80,7 +85,27 @@ const RestaurantPage: NextPage = () => {
             </Flex>
           )}
         </Grid>
-        <Divider borderColor="gray.300" />
+
+        <VStack spacing={4}>
+          <Grid
+            w="100%"
+            templateColumns={{ base: '1fr', md: '3fr 6fr' }}
+            templateRows={{ base: "'1fr' '1fr'", md: '1fr' }}
+            my={4}
+            gridGap={4}
+          >
+            <Center>
+              <VStack>
+                <Text>Média geral</Text>
+                <AverageText average={restaurant.averageRating} fontSize="5xl" />
+              </VStack>
+            </Center>
+            <RestaurantReviewsAverages reviews={reviews || []} />
+          </Grid>
+
+          <ReviewsTable reviews={reviews || []} />
+        </VStack>
+
         {isLoading ? (
           <VStack>
             {Array.from({ length: 8 }).map((_, idx) => (

@@ -17,6 +17,7 @@ import { useArrayQuery } from 'common/hooks/useArrayQuery';
 import useAuth from 'common/hooks/useAuth';
 import { useTRPC } from 'common/hooks/useTRPC';
 import AddRestaurant from '../AddRestaurant';
+import AverageText from '../AverageText';
 
 const RestaurantsList: React.FC = () => {
   const { useQuery } = useTRPC();
@@ -89,9 +90,7 @@ const RestaurantsList: React.FC = () => {
                 </VStack>
               </Flex>
               <Center>
-                <Text color="green" fontSize="2xl">
-                  {restaurant.averageRating}
-                </Text>
+                <AverageText average={restaurant.averageRating} fontSize="2xl" />
               </Center>
             </Grid>
           ))}
