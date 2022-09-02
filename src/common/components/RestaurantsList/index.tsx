@@ -1,3 +1,4 @@
+import Router from 'next/router';
 import { FaSearch } from 'react-icons/fa';
 import {
   Badge,
@@ -8,6 +9,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Skeleton,
   Text,
   VStack,
 } from '@chakra-ui/react';
@@ -20,7 +22,7 @@ const RestaurantsList: React.FC = () => {
   const { useQuery } = useTRPC();
   const { member } = useAuth();
 
-  const { data: restaurants } = useQuery(['restaurant.getAll']);
+  const { data: restaurants, isLoading } = useQuery(['restaurant.getAll']);
 
   const [filteredRestaurants, handleSearch] = useArrayQuery(restaurants || [], 'name');
 
@@ -36,49 +38,65 @@ const RestaurantsList: React.FC = () => {
           </InputRightElement>
         </InputGroup>
       </Grid>
-      <VStack>
-        {filteredRestaurants?.map(restaurant => (
-          <Grid
-            key={restaurant.id}
-            w="100%"
-            p={4}
-            borderRadius="lg"
-            borderWidth="1px"
-            borderStyle="solid"
-            templateColumns={{ base: '130px auto 90px', lg: '170px auto 90px' }}
-            _hover={{
-              cursor: 'pointer',
-              borderColor: 'gray.400',
-              transition: '0.4s',
-            }}
-          >
-            <Center px={4}>
-              <Text noOfLines={2} align="center" fontWeight="medium" fontSize="xl">
-                {restaurant.name}
-              </Text>
-            </Center>
-            <Flex align="center">
-              <VStack spacing={1} align="flex-start">
-                <Text fontWeight="semibold" ml={1}>
-                  Reviews: {restaurant.reviewsAmount}
+      {isLoading ? (
+        <VStack>
+          {Array.from({ length: 7 }).map((_, index) => (
+            <Skeleton key={`skeleton_restaurant_${index}`} h="80px" w="100%" borderRadius="lg" />
+          ))}
+        </VStack>
+      ) : (
+        <VStack>
+          {filteredRestaurants?.map(restaurant => (
+            <Grid
+              key={restaurant.id}
+              w="100%"
+              p={4}
+              borderRadius="lg"
+              borderWidth="1px"
+              borderStyle="solid"
+              templateColumns={{ base: '130px auto 90px', lg: '170px auto 90px' }}
+              _hover={{
+                cursor: 'pointer',
+                borderColor: 'gray.400',
+                transition: '0.4s',
+              }}
+              onClick={() => Router.push(`/restaurants/${restaurant.id}`)}
+            >
+              <Center px={4}>
+                <Text noOfLines={2} align="center" fontWeight="medium" fontSize="xl">
+                  {restaurant.name}
                 </Text>
-                <Flex flexFlow="wrap">
-                  {restaurant.wayToOrder.map(wayToOrder => (
-                    <Badge as={Box} borderRadius="md" m={1} px={2} py={0.5} key={`restaurant.id_${wayToOrder}`}>
-                      {wayToOrder}
-                    </Badge>
-                  ))}
-                </Flex>
-              </VStack>
-            </Flex>
-            <Center>
-              <Text color="green" fontSize="2xl">
-                {restaurant.averageRating}
-              </Text>
-            </Center>
-          </Grid>
-        ))}
-      </VStack>
+              </Center>
+              <Flex align="center">
+                <VStack spacing={1} align="flex-start">
+                  <Text fontWeight="semibold" ml={1}>
+                    Reviews: {restaurant.reviewsAmount}
+                  </Text>
+                  <Flex flexFlow="wrap">
+                    {restaurant.wayToOrder.map(wayToOrder => (
+                      <Badge
+                        as={Box}
+                        borderRadius="md"
+                        m={1}
+                        px={2}
+                        py={0.5}
+                        key={`restaurant.id_${wayToOrder}`}
+                      >
+                        {wayToOrder}
+                      </Badge>
+                    ))}
+                  </Flex>
+                </VStack>
+              </Flex>
+              <Center>
+                <Text color="green" fontSize="2xl">
+                  {restaurant.averageRating}
+                </Text>
+              </Center>
+            </Grid>
+          ))}
+        </VStack>
+      )}
     </Box>
   );
 };

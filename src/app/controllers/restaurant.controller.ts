@@ -18,6 +18,14 @@ export const restaurantsController = createRouter()
       return new RestaurantRepository().getAll();
     },
   })
+  .query('getOne', {
+    input: z.string(),
+    async resolve({ input }) {
+      const restaurants = await new RestaurantRepository().getAll();
+
+      return restaurants.find(({ id }) => id === input);
+    },
+  })
   .merge(
     createRouter()
       .middleware(({ ctx, next }) => {

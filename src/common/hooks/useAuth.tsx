@@ -1,6 +1,7 @@
 import React, { useContext, createContext, PropsWithChildren, useState } from 'react';
 import { LoginRequest } from 'app/controllers/login.controller';
 import Member from 'app/entities/Member';
+import { authInfo } from 'pages/_app';
 import useAlert from './useAlert';
 import { useTRPC } from './useTRPC';
 
@@ -23,6 +24,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setMember({
         name: req.name,
       });
+      authInfo.token = data.token;
       localStorage.setItem('auth', data.token);
       alert.success('Logado!');
     },

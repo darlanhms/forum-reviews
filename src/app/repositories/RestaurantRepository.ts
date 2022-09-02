@@ -15,6 +15,12 @@ export default class RestaurantRepository extends BaseRepository<Restaurant> {
     return super.getAll(this.getFilePath());
   }
 
+  async findById(id: string): Promise<Restaurant | null> {
+    const restaurants = await this.getAll();
+
+    return restaurants.find(restaurant => restaurant.id === id) || null;
+  }
+
   async save(restaurant: Restaurant): Promise<Restaurant> {
     const restaurants = await this.getAll();
 

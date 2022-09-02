@@ -6,6 +6,7 @@ export default interface Review {
   productRating: number;
   priceRating: number;
   packageRating: number;
+  waitTimeRating: number;
   averageRating: number;
   additionalInfo?: string;
 }
