@@ -24,4 +24,18 @@ export default class ReviewRepository extends BaseRepository<Review> {
 
     return review;
   }
+
+  async delete(id: string, restaurantId: string): Promise<void> {
+    const reviews = await this.getAll(restaurantId);
+
+    const review = reviews.find(review => review.id === id);
+
+    if (!review) {
+      return;
+    }
+
+    const newReviews = this.removeFromArray(reviews, review);
+
+    await this.saveFileContent(this.getFilePath(review.restaurantId), newReviews);
+  }
 }

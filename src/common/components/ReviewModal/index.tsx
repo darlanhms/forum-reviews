@@ -1,5 +1,5 @@
 /* eslint-disable guard-for-in */
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
   Textarea,
   VStack,
 } from '@chakra-ui/react';
+import Review from 'app/entities/Review';
 import useAlert from 'common/hooks/useAlert';
 import useAuth from 'common/hooks/useAuth';
 import { useTRPC } from 'common/hooks/useTRPC';
@@ -23,6 +24,7 @@ interface ReviewModalProps {
   restaurantId: string;
   open: boolean;
   onClose: () => void;
+  reviewToUpdate?: Review;
 }
 
 interface Ratings {
@@ -33,13 +35,15 @@ interface Ratings {
   waitTime?: number;
 }
 
-const ReviewModal: React.FC<ReviewModalProps> = ({ open, onClose, restaurantId }) => {
+const ReviewModal: React.FC<ReviewModalProps> = ({ open, onClose, restaurantId, reviewToUpdate }) => {
   const [ratings, setRatings] = useState<Ratings>({});
   const { member } = useAuth();
   const { useMutation, useContext } = useTRPC();
   const alert = useAlert();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const utils = useContext();
+
+  const isEditing = !!reviewToUpdate;
 
   const handleClose = () => {
     setRatings({});
@@ -50,13 +54,48 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onClose, restaurantId }
     onClose();
   };
 
+  useEffect(() => {
+    if (reviewToUpdate) {
+      setTimeout(() => {
+        setRatings({
+          package: reviewToUpdate.packageRating,
+          price: reviewToUpdate.priceRating,
+          product: reviewToUpdate.productRating,
+          service: reviewToUpdate.serviceRating,
+          waitTime: reviewToUpdate.waitTimeRating,
+        });
+
+        if (textAreaRef.current) {
+          textAreaRef.current.value = reviewToUpdate.additionalInfo || '';
+        }
+      }, 200);
+    }
+  }, [reviewToUpdate]);
+
+  const invalidateQueries = () => {
+    utils.invalidateQueries(['review.getByRestaurant', restaurantId]);
+    utils.invalidateQueries(['restaurant.getOne', restaurantId]);
+    utils.invalidateQueries(['restaurant.getAll']);
+  };
+
   const createReviewMutation = useMutation('review.create', {
     onError(error) {
       alert.error(error.message);
     },
     onSuccess() {
-      utils.invalidateQueries(['review.getByRestaurant', restaurantId]);
+      invalidateQueries();
       alert.success('Review enviada com sucesso!');
+      handleClose();
+    },
+  });
+
+  const updateReviewMutation = useMutation('review.update', {
+    onError(error) {
+      alert.error(error.message);
+    },
+    onSuccess() {
+      invalidateQueries();
+      alert.success('Review atualizada com sucesso!');
       handleClose();
     },
   });
@@ -92,23 +131,36 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onClose, restaurantId }
       return;
     }
 
-    createReviewMutation.mutate({
-      restaurantId,
-      member: member.name,
-      serviceRating: ratings.service,
-      priceRating: ratings.price,
-      packageRating: ratings.package,
-      productRating: ratings.product,
-      waitTimeRating: ratings.waitTime,
-      additionalInfo: textAreaRef.current?.value,
-    });
+    if (isEditing) {
+      updateReviewMutation.mutate({
+        id: reviewToUpdate.id,
+        restaurantId,
+        serviceRating: ratings.service,
+        priceRating: ratings.price,
+        packageRating: ratings.package,
+        productRating: ratings.product,
+        waitTimeRating: ratings.waitTime,
+        additionalInfo: textAreaRef.current?.value,
+      });
+    } else {
+      createReviewMutation.mutate({
+        restaurantId,
+        member: member.name,
+        serviceRating: ratings.service,
+        priceRating: ratings.price,
+        packageRating: ratings.package,
+        productRating: ratings.product,
+        waitTimeRating: ratings.waitTime,
+        additionalInfo: textAreaRef.current?.value,
+      });
+    }
   };
 
   return (
-    <Modal isCentered isOpen={open} onClose={handleClose} size="xl">
+    <Modal isCentered isOpen={open} onClose={handleClose} size="xl" scrollBehavior="inside">
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Criar review</ModalHeader>
+      <ModalContent maxW="fit-content">
+        {isEditing ? <ModalHeader>Editar review</ModalHeader> : <ModalHeader>Criar review</ModalHeader>}
         <ModalCloseButton />
         <ModalBody>
           <VStack spacing={3.5}>
@@ -195,7 +247,11 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onClose, restaurantId }
           <Button colorScheme="red" mr={3} onClick={handleClose}>
             Cancelar
           </Button>
-          <Button isLoading={createReviewMutation.isLoading} colorScheme="green" onClick={onSubmit}>
+          <Button
+            isLoading={createReviewMutation.isLoading || updateReviewMutation.isLoading}
+            colorScheme="green"
+            onClick={onSubmit}
+          >
             Enviar
           </Button>
         </ModalFooter>

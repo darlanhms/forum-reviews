@@ -37,4 +37,8 @@ export abstract class BaseRepository<Entity> {
 
     return entities;
   }
+
+  protected removeFromArray(entities: Array<Entity>, entity: Entity): Array<Entity> {
+    return entities.filter(entitySaved => !this.compare(entitySaved, entity));
+  }
 }

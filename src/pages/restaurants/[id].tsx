@@ -14,6 +14,7 @@ import {
   useBoolean,
   VStack,
 } from '@chakra-ui/react';
+import DeleteReviewModal from 'common/components/DeleteReviewModal';
 import Navbar from 'common/components/Navbar';
 import ReviewModal from 'common/components/ReviewModal';
 import useAuth from 'common/hooks/useAuth';
@@ -24,6 +25,7 @@ const RestaurantPage: NextPage = () => {
   const { useQuery } = useTRPC();
   const { member } = useAuth();
   const [modalOpen, setModalOpen] = useBoolean(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useBoolean(false);
 
   const { data: restaurant } = useQuery(['restaurant.getOne', id as string]);
 
@@ -37,7 +39,7 @@ const RestaurantPage: NextPage = () => {
     );
   }
 
-  const alreadyReviewed = !!reviews?.find(review => review.member === member?.name);
+  const reviewAlreadyAdded = reviews?.find(review => review.member === member?.name);
 
   return (
     <>
@@ -49,7 +51,7 @@ const RestaurantPage: NextPage = () => {
           </Flex>
           {member && (
             <Flex gap="5px" justify="flex-end">
-              {!alreadyReviewed && (
+              {!reviewAlreadyAdded && (
                 <IconButton
                   onClick={setModalOpen.on}
                   size="sm"
@@ -60,12 +62,17 @@ const RestaurantPage: NextPage = () => {
                   <FaPlus size={15} />
                 </IconButton>
               )}
-              {alreadyReviewed && (
+              {reviewAlreadyAdded && (
                 <>
-                  <IconButton size="sm" colorScheme="blue" aria-label="Editar review">
+                  <IconButton onClick={setModalOpen.on} size="sm" colorScheme="blue" aria-label="Editar review">
                     <FaPencilAlt size={15} />
                   </IconButton>
-                  <IconButton size="sm" colorScheme="red" aria-label="Excluir review">
+                  <IconButton
+                    onClick={setDeleteModalOpen.on}
+                    size="sm"
+                    colorScheme="red"
+                    aria-label="Excluir review"
+                  >
                     <FaTrashAlt size={15} />
                   </IconButton>
                 </>
@@ -83,7 +90,23 @@ const RestaurantPage: NextPage = () => {
         ) : (
           <></>
         )}
-        <ReviewModal restaurantId={restaurant.id} open={modalOpen} onClose={setModalOpen.off} />
+        {modalOpen && (
+          <ReviewModal
+            restaurantId={restaurant.id}
+            open={modalOpen}
+            onClose={setModalOpen.off}
+            reviewToUpdate={reviewAlreadyAdded}
+          />
+        )}
+        {Boolean(deleteModalOpen && reviewAlreadyAdded) && (
+          <DeleteReviewModal
+            open={deleteModalOpen}
+            onClose={setDeleteModalOpen.off}
+            restaurantId={restaurant.id}
+            restaurantName={restaurant.name}
+            reviewId={reviewAlreadyAdded?.id as string}
+          />
+        )}
       </Container>
     </>
   );
