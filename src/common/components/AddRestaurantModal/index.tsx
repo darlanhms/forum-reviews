@@ -12,7 +12,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  useBoolean,
   VStack,
 } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -43,8 +42,12 @@ interface RestaurantSubmitData {
   waysToOrder: Record<WayToOrder, boolean>;
 }
 
-const AddRestaurant: React.FC = () => {
-  const [open, setOpen] = useBoolean(false);
+interface AddRestaurantModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const AddRestaurantModal: React.FC<AddRestaurantModalProps> = ({ open, onClose }) => {
   const { control, handleSubmit } = useForm({
     defaultValues: {
       name: '',
@@ -63,9 +66,9 @@ const AddRestaurant: React.FC = () => {
 
   const createRestaurantMutation = useMutation(['restaurant.create'], {
     onSuccess() {
-      setOpen.off();
       alert.success('Estabelecimento criado!');
       utils.invalidateQueries(['restaurant.getAll']);
+      onClose();
     },
     onError(error) {
       alert.error('Erro ao criar estabelecimento', error.message);
@@ -90,53 +93,49 @@ const AddRestaurant: React.FC = () => {
   };
 
   return (
-    <>
-      <Button onClick={setOpen.on} colorScheme="green">
-        + Adicionar
-      </Button>
+    <Modal size="md" isCentered isOpen={open} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Adicionar estabelecimento</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <form>
+            <VStack spacing={5} align="flex-start">
+              <FormInput placeholder="Nome do estabelecimento" name="name" control={control} />
 
-      {open && (
-        <Modal size="md" isCentered isOpen={open} onClose={setOpen.off}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Adicionar estabelecimento</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <form>
-                <VStack spacing={5} align="flex-start">
-                  <FormInput placeholder="Nome do estabelecimento" name="name" control={control} />
-
-                  <Box w="100%">
-                    <Text fontSize="md" fontWeight={500} mb={2}>
-                      Como pedir?
-                    </Text>
-                    {waysToOrderChunks.map((waysToOrderChunk, index) => (
-                      <HStack spacing="20px" key={`variation_array_${index}`}>
-                        {waysToOrderChunk.map(wayToOrder => (
-                          <FormCheckbox name={`waysToOrder.${wayToOrder}`} key={wayToOrder} control={control}>
-                            {wayToOrder}
-                          </FormCheckbox>
-                        ))}
-                      </HStack>
+              <Box w="100%">
+                <Text fontSize="md" fontWeight={500} mb={2}>
+                  Como pedir?
+                </Text>
+                {waysToOrderChunks.map((waysToOrderChunk, index) => (
+                  <HStack spacing="20px" key={`variation_array_${index}`}>
+                    {waysToOrderChunk.map(wayToOrder => (
+                      <FormCheckbox name={`waysToOrder.${wayToOrder}`} key={wayToOrder} control={control}>
+                        {wayToOrder}
+                      </FormCheckbox>
                     ))}
-                  </Box>
-                </VStack>
-              </form>
-            </ModalBody>
+                  </HStack>
+                ))}
+              </Box>
+            </VStack>
+          </form>
+        </ModalBody>
 
-            <ModalFooter>
-              <Button colorScheme="red" mr={3} onClick={setOpen.off}>
-                Cancelar
-              </Button>
-              <Button onClick={handleSubmit(onSubmit)} colorScheme="green">
-                Adicionar
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-    </>
+        <ModalFooter>
+          <Button colorScheme="red" mr={3} onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            isLoading={createRestaurantMutation.isLoading}
+            colorScheme="green"
+          >
+            Adicionar
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 
-export default AddRestaurant;
+export default AddRestaurantModal;

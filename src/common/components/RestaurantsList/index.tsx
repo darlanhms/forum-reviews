@@ -3,6 +3,7 @@ import { FaSearch } from 'react-icons/fa';
 import {
   Badge,
   Box,
+  Button,
   Center,
   Flex,
   Grid,
@@ -11,17 +12,20 @@ import {
   InputRightElement,
   Skeleton,
   Text,
+  useBoolean,
   VStack,
 } from '@chakra-ui/react';
 import { useArrayQuery } from 'common/hooks/useArrayQuery';
 import useAuth from 'common/hooks/useAuth';
 import { useTRPC } from 'common/hooks/useTRPC';
-import AddRestaurant from '../AddRestaurant';
+import AddRestaurantModal from '../AddRestaurantModal';
 import AverageText from '../AverageText';
 
 const RestaurantsList: React.FC = () => {
   const { useQuery } = useTRPC();
   const { member } = useAuth();
+
+  const [open, setOpen] = useBoolean(false);
 
   const { data: restaurants, isLoading } = useQuery(['restaurant.getAll']);
 
@@ -30,7 +34,13 @@ const RestaurantsList: React.FC = () => {
   return (
     <Box>
       <Grid templateColumns="125px auto 180px" my={5}>
-        {member ? <AddRestaurant /> : <div />}
+        {member ? (
+          <Button onClick={setOpen.on} colorScheme="green">
+            + Adicionar
+          </Button>
+        ) : (
+          <div />
+        )}
         <div />
         <InputGroup>
           <Input onChange={e => handleSearch(e.target.value)} placeholder="Pesquisar..." />
@@ -96,6 +106,8 @@ const RestaurantsList: React.FC = () => {
           ))}
         </VStack>
       )}
+
+      {open && <AddRestaurantModal open={open} onClose={setOpen.off} />}
     </Box>
   );
 };

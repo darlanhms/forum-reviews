@@ -1,4 +1,12 @@
-export const waysToOrder = ['Telefone', 'App próprio', 'Pedidos10', 'iFood'] as const;
+export const waysToOrder = [
+  'Telefone',
+  'App próprio',
+  'Pedidos10',
+  'iFood',
+  'Delivery Much',
+  'Balcão',
+  'WhatsApp',
+] as const;
 
 export type WayToOrder = typeof waysToOrder[number];
 
