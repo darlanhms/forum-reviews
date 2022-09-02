@@ -18,10 +18,22 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import Review from 'app/entities/Review';
+import roundOneCase from 'app/utils/roundOneCase';
 
 interface ReviewsTableProps {
   reviews: Array<Review>;
 }
+
+const calculateAverage = (review: Review) => {
+  return roundOneCase(
+    (review.serviceRating +
+      review.priceRating +
+      review.packageRating +
+      review.productRating +
+      review.waitTimeRating) /
+      5,
+  );
+};
 
 const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews }) => {
   const [observation, setObservation] = useState<string>();
@@ -38,6 +50,7 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews }) => {
               <Th textAlign="center">Produto</Th>
               <Th textAlign="center">T. Espera</Th>
               <Th textAlign="center">Embalagem</Th>
+              <Th textAlign="center">Média</Th>
               <Th textAlign="center">Obs.</Th>
             </Tr>
           </Thead>
@@ -50,6 +63,7 @@ const ReviewsTable: React.FC<ReviewsTableProps> = ({ reviews }) => {
                 <Td textAlign="center">{review.productRating}</Td>
                 <Td textAlign="center">{review.waitTimeRating}</Td>
                 <Td textAlign="center">{review.packageRating}</Td>
+                <Td textAlign="center">{calculateAverage(review)}</Td>
                 <Td textAlign="center">
                   {review.additionalInfo ? (
                     <Button colorScheme="blue" size="sm" onClick={() => setObservation(review.additionalInfo)}>
