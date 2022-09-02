@@ -55,7 +55,7 @@ const RestaurantsList: React.FC = () => {
               borderRadius="lg"
               borderWidth="1px"
               borderStyle="solid"
-              templateColumns={{ base: '130px auto 90px', lg: '170px auto 90px' }}
+              templateColumns={{ base: '130px auto 90px', lg: '200px auto 90px' }}
               _hover={{
                 cursor: 'pointer',
                 borderColor: 'gray.400',
